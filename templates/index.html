@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        /* Style the tab buttons */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'Admin')">Admin</button>
+    <button class="tablinks" onclick="openTab(event, 'Attendance')">Attendance</button>
+    <button class="tablinks" onclick="openTab(event, 'Salary')">Salary</button>
+    <button class="tablinks" onclick="openTab(event, 'Misc')">Misc</button>
+</div>
+
+<!-- Tab content -->
+<div id="Admin" class="tabcontent">
+    <h3>Admin Tab</h3>
+    <h3>Create New Employee</h3>
+    <form action="/add_employee" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="contact">Contact Details:</label>
+        <input type="text" id="contact" name="contact" required><br><br>
+        <button type="submit">Add Employee</button>
+    </form>
+
+    <hr>
+
+    <h3>List of Employees</h3>
+    <ul>
+        {% for employee in employees %}
+            <li>{{ employee.id }}: {{ employee.name }} - {{ employee.contact }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+<div id="Attendance" class="tabcontent">
+    <h3>Attendance Tab</h3>
+    <!-- Attendance content goes here -->
+</div>
+
+<div id="Salary" class="tabcontent">
+    <h3>Salary Tab</h3>
+    <!-- Salary content goes here -->
+</div>
+
+<div id="Misc" class="tabcontent">
+    <h3>Misc Tab</h3>
+    <!-- Misc content goes here -->
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+</body>
+</html>
