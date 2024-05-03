@@ -11,8 +11,7 @@ app.template_folder = '../templates/'  # Configuring the template folder
 def create_tables():
     conn = sqlite3.connect('attendance.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS employees
-                 (id INTEGER PRIMARY KEY, name TEXT, contact TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS employees (id INTEGER PRIMARY KEY, name TEXT, contact TEXT)''')  # Add 'contact' column
     c.execute('''CREATE TABLE IF NOT EXISTS attendance
                  (id INTEGER PRIMARY KEY, employee_id INTEGER, check_in TEXT, check_out TEXT)''')
     conn.commit()
@@ -31,11 +30,13 @@ def index():
     c = conn.cursor()
     c.execute("SELECT * FROM employees")
     employees = c.fetchall()
+    print("Fetched employees:", employees)
     conn.close()
 
     return render_template('index.html', employees=employees)
 
 
+# Route to handle adding an employee
 # Route to handle adding an employee
 @app.route('/add_employee', methods=['POST'])
 def add_employee():

@@ -69,7 +69,7 @@
     <h3>List of Employees</h3>
     <ul>
         {% for employee in employees %}
-            <li>{{ employee.id }}: {{ employee.name }} - {{ employee.contact }}</li>
+            <li>{{ employee[0] }}: {{ employee[1] }} - {{ employee[2] }}</li>
         {% endfor %}
     </ul>
 </div>
