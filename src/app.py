@@ -33,7 +33,27 @@ def index():
     print("Fetched employees:", employees)
     conn.close()
 
-    return render_template('index.html', employees=employees)
+    # Dummy data for months and days (you can replace this with actual data)
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+              "November", "December"]
+    days = list(range(1, 32))  # Assuming all months have 31 days
+
+    # Define the number of days in each month
+    days_in_month = {
+        "January": 31,
+        "February": 28,  # Assuming non-leap year
+        "March": 31,
+        "April": 30,
+        "May": 31,
+        "June": 30,
+        "July": 31,
+        "August": 31,
+        "September": 30,
+        "October": 31,
+        "November": 30,
+        "December": 31
+    }
+    return render_template('index.html', employees=employees, months=months, days_in_month=days_in_month)
 
 
 # Route to handle adding an employee
