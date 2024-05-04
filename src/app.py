@@ -1,5 +1,5 @@
 # Import necessary modules
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
 
 # Initialize Flask app
@@ -13,7 +13,12 @@ def create_tables():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS employees (id INTEGER PRIMARY KEY, name TEXT, contact TEXT)''')  # Add 'contact' column
     c.execute('''CREATE TABLE IF NOT EXISTS attendance
-                 (id INTEGER PRIMARY KEY, employee_id INTEGER, check_in TEXT, check_out TEXT)''')
+                 (id INTEGER PRIMARY KEY,
+                 employee_id INTEGER, 
+                 employee_name TEXT,
+                 month INTEGER, 
+                 day INTEGER)''')
+
     conn.commit()
     conn.close()
 
@@ -89,35 +94,36 @@ def add_employee():
 
 
 # Route to handle attendance submission
-@app.route('/submit_attendance', methods=['POST'])
-def submit_attendance():
+@app.route('/save_attendance', methods=['POST'])
+def save_attendance():
     if request.method == 'POST':
-        # Parse attendance data from the form
-        employee_id = request.form['employee_id']
-        month = request.form['month']
-        day = request.form['day']
-        attendance_status = request.form['attendance_status']  # Assuming this is how you track attendance
+        # Get data from the AJAX request
+        data = request.json
+        employee_id = data['employee_id']
+        employee_name = data['employee_name']
+        month = data['month']
+        day = data['day']
 
         try:
             # Connect to SQLite database
             conn = sqlite3.connect('attendance.db')
             c = conn.cursor()
 
-            # Insert attendance data into the database
-            c.execute("INSERT INTO attendance (employee_id, month, day, attendance_status) VALUES (?, ?, ?, ?)",
-                      (employee_id, month, day, attendance_status))
+            print(employee_id, month, day)
+            # Insert attendance record into the database
+            c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
+                      (employee_id, employee_name, month, day))
 
             # Commit changes and close connection
             conn.commit()
             conn.close()
 
-            # Redirect to a success page or display a success message
-            return redirect(url_for('success'))
+            # Return success response
+            return jsonify({'success': True}), 200
         except Exception as e:
             # Handle errors
             print("Error:", e)
-            return "An error occurred while submitting attendance."
-
+            return jsonify({'success': False, 'error': str(e)}), 500
 
 # Run the Flask app
 if __name__ == '__main__':
