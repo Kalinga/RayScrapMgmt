@@ -88,24 +88,38 @@
         <table id="{{ month }}" class="attendance-table" style="display:none;">
             <thead>
                 <tr>
-                    <th>Day</th>
-                    <!-- Add more header columns as needed -->
-                    <th>Present</th>
+                    <th>Employee Name</th>
+                    <!-- Loop over days to create header columns -->
+                    {% for day in range(1, days_in_month[month] + 1) %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                <!-- Loop over each day of the month -->
-                {% for day in range(1, days_in_month[month] + 1) %}
+                <!-- Loop over employees -->
+                {% for employee in employees %}
                     <tr>
-                        <td>{{ day }}</td>
-                        <!-- Add a checkbox for marking attendance -->
-                        <td><input type="checkbox" name="attendance_{{ month }}_{{ day }}"></td>
+                        <td>{{ employee.name }}</td>
+                        <!-- Loop over days to create checkboxes -->
+                        {% for day in range(1, days_in_month[month] + 1) %}
+                            <td style="padding: 10px;"><input type="checkbox"
+                                name="attendance_{{ employee.id }}_{{ month }}_{{ day }}"
+                                title="{{ employee.name }}"></td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>
+            <tr>
+            <th>Employee Name</th>
+            <!-- Loop over days to create header columns -->
+            {% for day in range(1, days_in_month[month] + 1) %}
+                <th>{{ day }}</th>
+            {% endfor %}
+        </tr>
         </table>
     {% endfor %}
 </div>
+
 <script>
     // Function to toggle the visibility of attendance tables
     function openMonth(month) {

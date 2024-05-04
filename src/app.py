@@ -27,10 +27,23 @@ create_tables()
 def index():
     # Fetch employees from the database
     conn = sqlite3.connect('attendance.db')
+    # Enable row factory
+    conn.row_factory = sqlite3.Row
+
+    # Create a cursor
     c = conn.cursor()
+
+    # Execute the query
     c.execute("SELECT * FROM employees")
-    employees = c.fetchall()
-    print("Fetched employees:", employees)
+
+    # Fetch all rows as dictionaries
+    rows = c.fetchall()
+
+    # Convert rows into a list of dictionaries
+    employees = [dict(row) for row in rows]
+
+    # Now each item in the 'employees' list is a dictionary with column names as keys
+    print(employees)
     conn.close()
 
     # Dummy data for months and days (you can replace this with actual data)
@@ -73,6 +86,37 @@ def add_employee():
         conn.close()
 
         return redirect(url_for('index'))
+
+
+# Route to handle attendance submission
+@app.route('/submit_attendance', methods=['POST'])
+def submit_attendance():
+    if request.method == 'POST':
+        # Parse attendance data from the form
+        employee_id = request.form['employee_id']
+        month = request.form['month']
+        day = request.form['day']
+        attendance_status = request.form['attendance_status']  # Assuming this is how you track attendance
+
+        try:
+            # Connect to SQLite database
+            conn = sqlite3.connect('attendance.db')
+            c = conn.cursor()
+
+            # Insert attendance data into the database
+            c.execute("INSERT INTO attendance (employee_id, month, day, attendance_status) VALUES (?, ?, ?, ?)",
+                      (employee_id, month, day, attendance_status))
+
+            # Commit changes and close connection
+            conn.commit()
+            conn.close()
+
+            # Redirect to a success page or display a success message
+            return redirect(url_for('success'))
+        except Exception as e:
+            # Handle errors
+            print("Error:", e)
+            return "An error occurred while submitting attendance."
 
 
 # Run the Flask app
