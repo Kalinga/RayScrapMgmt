@@ -105,7 +105,9 @@
                             <td style="padding: 10px;"><input type="checkbox"
                                 onclick="saveAttendance('{{ employee.id }}','{{ employee.name }}', '{{ month }}', '{{ day }}')"
                                 name="attendance_{{ employee.id }}_{{ month }}_{{ day }}"
-                                title="{{ employee.name }}"></td>
+                                title="{{ employee.name }}"
+                                {% if attendance_records[employee.id][month][day] %} checked {% endif %}>
+                            </td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -122,7 +124,7 @@
 </div>
 
 <script>
-    function saveAttendance(employeeId, employeeName, month, day) {
+    function saveAttendance(employeeId, employeeName, month, day, checked) {
         // Make an AJAX request to Flask backend to save attendance record
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/save_attendance", true);

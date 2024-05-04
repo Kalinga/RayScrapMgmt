@@ -30,26 +30,6 @@ create_tables()
 # Route to display the Admin tab
 @app.route('/')
 def index():
-    # Fetch employees from the database
-    conn = sqlite3.connect('attendance.db')
-    # Enable row factory
-    conn.row_factory = sqlite3.Row
-
-    # Create a cursor
-    c = conn.cursor()
-
-    # Execute the query
-    c.execute("SELECT * FROM employees")
-
-    # Fetch all rows as dictionaries
-    rows = c.fetchall()
-
-    # Convert rows into a list of dictionaries
-    employees = [dict(row) for row in rows]
-
-    # Now each item in the 'employees' list is a dictionary with column names as keys
-    print(employees)
-    conn.close()
 
     # Dummy data for months and days (you can replace this with actual data)
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -71,7 +51,51 @@ def index():
         "November": 30,
         "December": 31
     }
-    return render_template('index.html', employees=employees, months=months, days_in_month=days_in_month)
+    # Fetch employees from the database
+    conn = sqlite3.connect('attendance.db')
+    # Enable row factory
+    conn.row_factory = sqlite3.Row
+
+    # Create a cursor
+    c = conn.cursor()
+
+    # Execute the query
+    c.execute("SELECT * FROM employees")
+
+    # Fetch all rows as dictionaries
+    rows = c.fetchall()
+
+    # Convert rows into a list of dictionaries
+    employees = [dict(row) for row in rows]
+
+    # Now each item in the 'employees' list is a dictionary with column names as keys
+    print(employees)
+
+    # Fetch attendance records for each employee and each day
+    attendance_records = {}
+    for employee in employees:
+        employee_id = employee['id']
+        attendance_records[employee_id] = {}
+        for month in months:
+            attendance_records[employee_id][month] = {}
+            for day in range(1, days_in_month[month] + 1):
+                attendance_records[employee_id][month][day] = False  # Initialize as unchecked
+
+    # Execute the query to fetch attendance records
+    c.execute("SELECT employee_id, month, day FROM attendance")
+    rows = c.fetchall()
+    for row in rows:
+        employee_id = row['employee_id']
+        month = row['month']
+        day = row['day']
+        attendance_records[employee_id][month][day] = True  # Mark as checked
+    print (attendance_records)
+
+    conn.close()
+
+    return render_template('index.html', employees=employees,
+                           months=months, days_in_month=days_in_month,
+                           attendance_records=attendance_records)
 
 
 # Route to handle adding an employee
@@ -110,9 +134,10 @@ def save_attendance():
             c = conn.cursor()
 
             print(employee_id, month, day)
+
             # Insert attendance record into the database
-            c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
-                      (employee_id, employee_name, month, day))
+            c.execute("INSERT INTO attendance (employee_id, month, day) VALUES (?, ?, ?)",
+                      (employee_id, month, day))
 
             # Commit changes and close connection
             conn.commit()
