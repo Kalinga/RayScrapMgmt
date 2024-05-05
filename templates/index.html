@@ -209,6 +209,24 @@
         <input type="text" id="advance" name="advance">
     </div>
     <button onclick="submitSalary()">Submit</button>
+     <!-- Table to display salary information -->
+    <table id="salaryTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Salary</th>
+            </tr>
+        </thead>
+        <tbody id="salaryTableBody">
+            <!-- Salary information will be dynamically added here -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total Payment:</td>
+                <td id="totalPayment"></td>
+            </tr>
+        </tfoot>
+    </table>
 </div>
 
 <script>
@@ -222,7 +240,10 @@
             alert("Please enter a valid date!");
             return; // Exit the function to prevent further execution
         }
-
+        if (advance === "") {
+            alert("Please enter a valid advance!");
+            return; // Exit the function to prevent further execution
+        }
         // Simulate saving data to the database (replace this with your actual implementation)
         var formData = new FormData();
         formData.append("salaryDate", salaryDate);
@@ -238,17 +259,54 @@
         .then(response => {
             if (response.ok) {
                 // Data saved successfully
-                alert("Payment saved successfully!");
+                console.log("Data saved successfully!");
+                alert("Salary saved successfully!!");
+
                 // Reset the Advance field
                 advance.value = "";
+
+                // Fetch salary information for the selected employee
+                fetchSalary(employee);
             } else {
                 // Error handling
-                alert("Error during saving data to Database!");
+                console.error("Failed to save data:", response.statusText);
+                alert("Failed to save data:", response.statusText);
+
             }
         })
         .catch(error => {
             console.error("Error:", error);
         });
+    }
+
+    // Function to fetch and display salary information for the selected employee
+    function fetchSalary(employee) {
+        // Simulate fetching salary information from the server
+        // Replace this with your actual implementation to fetch data from the database
+        // For demonstration purposes, I'm just adding dummy data
+        var dummyData = [
+            { date: "2024-05-04", salary: 1000 },
+            { date: "2024-05-05", salary: 1200 },
+            { date: "2024-05-06", salary: 1500 }
+        ];
+
+        // Clear existing table data
+        var tableBody = document.getElementById("salaryTableBody");
+        tableBody.innerHTML = "";
+
+        // Populate the table with fetched salary information
+        var totalPayment = 0;
+        dummyData.forEach(entry => {
+            var row = tableBody.insertRow();
+            var cellDate = row.insertCell(0);
+            var cellSalary = row.insertCell(1);
+            cellDate.textContent = entry.date;
+            cellSalary.textContent = entry.salary;
+            totalPayment += entry.salary;
+        });
+
+        // Update the total payment
+        document.getElementById("totalPayment").textContent = totalPayment;
     }
 </script>
 

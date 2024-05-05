@@ -51,7 +51,7 @@ def index():
         "July": 31,
         "August": 31,
         "September": 30,
-        "October": 31,
+        "October":+ 31,
         "November": 30,
         "December": 31
     }
