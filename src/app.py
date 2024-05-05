@@ -153,6 +153,34 @@ def save_attendance():
             print("Error:", e)
             return jsonify({'success': False, 'error': str(e)}), 500
 
+# Route to fetch salary information for the selected employee
+@app.route('/get_salary', methods=['GET'])
+def get_salary():
+    # Get the selected employee from the request query parameters
+    employee_name = request.args.get('employee')
+
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect('attendance.db')
+        c = conn.cursor()
+
+        # Query the database to retrieve salary information for the selected employee
+        c.execute("SELECT date, advance FROM salary WHERE employee_id = ?", (employee_name,))
+        salary_data = c.fetchall()
+
+        # Convert the fetched data into a list of dictionaries
+        salary_info = [{'date': row[0], 'salary': row[1]} for row in salary_data]
+
+        # Close the database connection
+        conn.close()
+
+        # Return the salary information as JSON response
+        return jsonify(salary_info)
+
+    except Exception as e:
+        # Handle any errors that occur during database query
+        return jsonify({'error': str(e)})
+
 
 # Route to handle salary submission
 @app.route('/save_salary', methods=['POST'])

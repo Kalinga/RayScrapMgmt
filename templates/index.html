@@ -211,10 +211,10 @@
     <button onclick="submitSalary()">Submit</button>
      <!-- Table to display salary information -->
     <table id="salaryTable">
-        <thead>
+        <thead style="color: green;">
             <tr>
-                <th>Date</th>
-                <th>Salary</th>
+                <th style="font-weight: bold;">Date</th>
+                <th style="font-weight: bold;">Salary</th>
             </tr>
         </thead>
         <tbody id="salaryTableBody">
@@ -279,35 +279,58 @@
         });
     }
 
-    // Function to fetch and display salary information for the selected employee
     function fetchSalary(employee) {
-        // Simulate fetching salary information from the server
-        // Replace this with your actual implementation to fetch data from the database
-        // For demonstration purposes, I'm just adding dummy data
-        var dummyData = [
-            { date: "2024-05-04", salary: 1000 },
-            { date: "2024-05-05", salary: 1200 },
-            { date: "2024-05-06", salary: 1500 }
-        ];
+    // Make an AJAX request to fetch salary information for the selected employee
+    fetch("/get_salary?employee=" + employee)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Failed to fetch salary information");
+            }
+        })
+        .then(data => {
+            // Process the fetched data and display it in the table
+            displaySalary(data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
 
-        // Clear existing table data
-        var tableBody = document.getElementById("salaryTableBody");
-        tableBody.innerHTML = "";
+    // Function to display salary information in a table
+    function displaySalary(data) {
+        // Clear previous table content
+        var table = document.getElementById("salaryTable");
+        table.innerHTML = "";
 
-        // Populate the table with fetched salary information
-        var totalPayment = 0;
-        dummyData.forEach(entry => {
-            var row = tableBody.insertRow();
-            var cellDate = row.insertCell(0);
-            var cellSalary = row.insertCell(1);
-            cellDate.textContent = entry.date;
-            cellSalary.textContent = entry.salary;
-            totalPayment += entry.salary;
+        // Create table header
+        var headerRow = table.insertRow();
+        // Apply styles to the header row
+        headerRow.style.fontWeight = "bold";
+        headerRow.style.color = "green";
+        var dateHeader = headerRow.insertCell();
+        dateHeader.textContent = "Date";
+        var salaryHeader = headerRow.insertCell();
+        salaryHeader.textContent = "Salary";
+
+        // Loop through fetched data and populate the table
+        data.forEach(item => {
+            var row = table.insertRow();
+            var dateCell = row.insertCell();
+            dateCell.textContent = item.date;
+            var salaryCell = row.insertCell();
+            salaryCell.textContent = item.salary;
         });
 
-        // Update the total payment
-        document.getElementById("totalPayment").textContent = totalPayment;
+        // Calculate and display total payment
+        var totalPayment = data.reduce((total, item) => total + parseInt(item.salary), 0);
+        var totalRow = table.insertRow();
+        var totalCell = totalRow.insertCell();
+        totalCell.colSpan = 2;
+        totalCell.innerHTML = "<strong style='color: green;'>Total Payment:</strong> <strong style='color: green;'>" + totalPayment + "</strong>";
     }
+
 </script>
 
 <div id="Misc" class="tabcontent">
