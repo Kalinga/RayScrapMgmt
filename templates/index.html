@@ -191,84 +191,66 @@
 
 <div id="Salary" class="tabcontent">
     <h3>Salary Tab</h3>
-<div class="input-group">
-                <label for="salaryDate">Date:</label>
-                <input type="date" id="salaryDate" name="salaryDate">
-            </div>
-            <div class="input-group">
-                <label for="employee">Employee:</label>
-                <select id="employee" name="employee">
-                    <!-- Populate this dropdown with employee options -->
-                    {% for employee in employees %}
-                        <option value="{{ employee.name }}">{{ employee.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="advance">Advance:</label>
-                <input type="text" id="advance" name="advance">
-            </div>
-            <button onclick="submitSalary()">Submit</button>
-        </div>
+    <div class="input-group">
+        <label for="salaryDate">Date:</label>
+        <input type="date" id="salaryDate" name="salaryDate">
     </div>
-
-    <script>
-        // Add your JavaScript code here
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        // Initial tab
-        //document.getElementById("defaultOpen").click();
-
-        // Function to handle salary submission
-        function submitSalary() {
-            var salaryDate = document.getElementById("salaryDate").value;
-            var employee = document.getElementById("employee").value;
-            var advance = document.getElementById("advance").value;
-
-            if (salaryDate === "") {
-                alert("Please enter a valid date!");
-                return; // Exit the function to prevent further execution
-            }
-
-            // Simulate saving data to the database (replace this with your actual implementation)
-            var formData = new FormData();
-            formData.append("salaryDate", salaryDate);
-            formData.append("employee", employee);
-            formData.append("advance", advance);
-
-            // Simulate an AJAX request to save data to the server
-            // Replace the URL with the actual endpoint to save data
-            fetch("/save-salary", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Data saved successfully
-                    console.log("Data saved successfully!");
-                } else {
-                    // Error handling
-                    console.error("Failed to save data:", response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-        }
-    </script>
+    <div class="input-group">
+        <label for="employee">Employee:</label>
+        <select id="employee" name="employee">
+            <!-- Populate this dropdown with employee options -->
+            {% for employee in employees %}
+                <option value="{{ employee.name }}">{{ employee.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="input-group">
+        <label for="advance">Advance:</label>
+        <input type="text" id="advance" name="advance">
+    </div>
+    <button onclick="submitSalary()">Submit</button>
 </div>
+
+<script>
+    // Function to handle salary submission
+    function submitSalary() {
+        var salaryDate = document.getElementById("salaryDate").value;
+        var employee = document.getElementById("employee").value;
+        var advance = document.getElementById("advance").value;
+
+        if (salaryDate === "") {
+            alert("Please enter a valid date!");
+            return; // Exit the function to prevent further execution
+        }
+
+        // Simulate saving data to the database (replace this with your actual implementation)
+        var formData = new FormData();
+        formData.append("salaryDate", salaryDate);
+        formData.append("employee", employee);
+        formData.append("advance", advance);
+
+        // Simulate an AJAX request to save data to the server
+        // Replace the URL with the actual endpoint to save data
+        fetch("/save_salary", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                // Data saved successfully
+                alert("Payment saved successfully!");
+                // Reset the Advance field
+                advance.value = "";
+            } else {
+                // Error handling
+                alert("Error during saving data to Database!");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+</script>
 
 <div id="Misc" class="tabcontent">
     <h3>Misc Tab</h3>

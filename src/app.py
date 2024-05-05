@@ -18,7 +18,11 @@ def create_tables():
                  employee_name TEXT,
                  month INTEGER, 
                  day INTEGER)''')
-
+    c.execute('''CREATE TABLE IF NOT EXISTS salary
+                 (id INTEGER PRIMARY KEY,
+                 date TEXT,
+                 employee_id INTEGER, 
+                 advance INTEGER)''')  # Add 'salary' table
     conn.commit()
     conn.close()
 
@@ -99,7 +103,6 @@ def index():
 
 
 # Route to handle adding an employee
-# Route to handle adding an employee
 @app.route('/add_employee', methods=['POST'])
 def add_employee():
     if request.method == 'POST':
@@ -149,6 +152,38 @@ def save_attendance():
             # Handle errors
             print("Error:", e)
             return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# Route to handle salary submission
+@app.route('/save_salary', methods=['POST'])
+def save_salary():
+    if request.method == 'POST':
+        # Get data from the form
+        salary_date = request.form['salaryDate']
+        employee_id = request.form['employee']
+        advance = request.form['advance']
+
+        try:
+            # Connect to SQLite database
+            conn = sqlite3.connect('attendance.db')
+            c = conn.cursor()
+            print("save_salary", salary_date, employee_id, advance)
+
+            # Insert salary record into the database
+            c.execute("INSERT INTO salary (date, employee_id, advance) VALUES (?, ?, ?)",
+                      (salary_date, employee_id, advance))
+
+            # Commit changes and close connection
+            conn.commit()
+            conn.close()
+
+            # Return success response
+            return jsonify({'success': True}), 200
+        except Exception as e:
+            # Handle errors
+            print("Error:", e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
 
 # Run the Flask app
 if __name__ == '__main__':
