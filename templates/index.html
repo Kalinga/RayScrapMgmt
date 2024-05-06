@@ -359,7 +359,17 @@
         var salaryHeader = headerRow.insertCell();
         salaryHeader.textContent = "PerDay";
         var salaryHeader1 = headerRow.insertCell();
-        salaryHeader.textContent = "Total Wages";
+        salaryHeader1.textContent = "Total Wages";
+
+        var row = table.insertRow();
+        var days_worked = row.insertCell();
+        days_worked.textContent = data.days_worked;
+
+        var daily_salary = row.insertCell();
+        daily_salary.textContent = Math.round(data.monthly_salary / 30);
+
+        var total_wages = row.insertCell();
+        total_wages.textContent = Math.round(data.monthly_salary/30) * data.days_worked;
     }
 
     function fetchSalary(employee) {
