@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
 from datetime import date
+import datetime
 
 
 # Initialize Flask app
@@ -16,7 +17,7 @@ def create_tables():
     c.execute('''CREATE TABLE IF NOT EXISTS employees 
                  (id INTEGER PRIMARY KEY,
                  salary INTEGER,
-                 name TEXT,
+                 employee_name TEXT,
                  contact TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS attendance
                  (id INTEGER PRIMARY KEY,
@@ -27,7 +28,7 @@ def create_tables():
     c.execute('''CREATE TABLE IF NOT EXISTS salary
                  (id INTEGER PRIMARY KEY,
                  date TEXT,
-                 employee_id INTEGER, 
+                 employee_name TEXT, 
                  payment INTEGER)''')
     conn.commit()
     conn.close()
@@ -123,7 +124,7 @@ def add_employee():
         # Add the employee to the database
         conn = sqlite3.connect('employee.db')
         c = conn.cursor()
-        c.execute("INSERT INTO employees (name,salary, contact) VALUES (?, ?, ?)", (name, salary, contact))
+        c.execute("INSERT INTO employees (employee_name, salary, contact) VALUES (?, ?, ?)", (name, salary, contact))
         conn.commit()
         conn.close()
 
@@ -149,7 +150,7 @@ def save_attendance():
             print(employee_id, month, day)
 
             # Insert attendance record into the database
-            c.execute("INSERT INTO attendance (employee_id, month, day) VALUES (?, ?, ?)",
+            c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
                       (employee_id, month, day))
 
             # Commit changes and close connection
@@ -173,9 +174,18 @@ def get_salary():
         # Connect to the SQLite database
         conn = sqlite3.connect('employee.db')
         c = conn.cursor()
+        # Get the current year and month
+        current_year = datetime.datetime.now().year
+        current_month = datetime.datetime.now().month
+        # Construct the start and end date strings for the current month
+        start_date = f'{current_year}-{current_month:02d}-01'
+        end_date = f'{current_year}-{current_month:02d}-31'  # Assuming 31 days in a month, adjust as needed
+
 
         # Query the database to retrieve salary information for the selected employee
-        c.execute("SELECT date, payment FROM salary WHERE employee_id = ?", (employee_name,))
+        c.execute("SELECT date, payment FROM salary WHERE employee_name = ? AND date BETWEEN ? AND ?",
+                  (employee_name, start_date, end_date))
+
         salary_data = c.fetchall()
 
         # Convert the fetched data into a list of dictionaries
@@ -190,7 +200,6 @@ def get_salary():
     except Exception as e:
         # Handle any errors that occur during database query
         return jsonify({'error': str(e)})
-
 
 # Route to handle salary submission
 @app.route('/save_salary', methods=['POST'])
@@ -208,7 +217,7 @@ def save_salary():
             print("save_salary", salary_date, employee_id, payment)
 
             # Insert salary record into the database
-            c.execute("INSERT INTO salary (date, employee_id, payment) VALUES (?, ?, ?)",
+            c.execute("INSERT INTO salary (date, employee_name, payment) VALUES (?, ?, ?)",
                       (salary_date, employee_id, payment))
 
             # Commit changes and close connection
@@ -222,6 +231,45 @@ def save_salary():
             print("Error:", e)
             return jsonify({'success': False, 'error': str(e)}), 500
 
+
+
+# Route to get the monthly details including the number of days worked for an employee
+@app.route('/get_monthly_details', methods=['GET'])
+def get_monthly_details():
+    # Get the employee name from the request parameters
+    employee_name = request.args.get('employee')
+
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect('employee.db')
+        c = conn.cursor()
+
+        # Get the current year and month
+        current_year = datetime.datetime.now().year
+        current_month = datetime.datetime.now().month
+
+        # Query the attendance table to count the number of days the employee worked in the current month
+        c.execute("SELECT COUNT(*) FROM attendance WHERE employee_name = ? AND month = ?",
+                  (employee_name, current_month))
+        days_worked = c.fetchone()[0]
+
+        # Query the employees table to retrieve the salary of the specified employee
+        c.execute("SELECT salary FROM employees WHERE name = ?", (employee_name,))
+        salary_record = c.fetchone()
+
+        if salary_record:
+            # If the employee exists, return the monthly salary and number of days worked as JSON response
+            return jsonify({'employee_name': employee_name, 'monthly_salary': salary_record[0], 'days_worked': days_worked})
+        else:
+            # If the employee does not exist, return an error message
+            return jsonify({'error': 'Employee not found'}), 404
+    except Exception as e:
+        # If any error occurs during database connection or query execution, return an error message
+        return jsonify({'error': str(e)}), 500
+    finally:
+        # Close the database connection
+        if 'conn' in locals():
+            conn.close()
 
 # Run the Flask app
 if __name__ == '__main__':
