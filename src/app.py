@@ -1,6 +1,8 @@
 # Import necessary modules
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
+from datetime import date
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -9,9 +11,13 @@ app.template_folder = '../templates/'  # Configuring the template folder
 
 # Function to create the SQLite database and tables
 def create_tables():
-    conn = sqlite3.connect('attendance.db')
+    conn = sqlite3.connect('employee.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS employees (id INTEGER PRIMARY KEY, name TEXT, contact TEXT)''')  # Add 'contact' column
+    c.execute('''CREATE TABLE IF NOT EXISTS employees 
+                 (id INTEGER PRIMARY KEY,
+                 salary INTEGER,
+                 name TEXT,
+                 contact TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS attendance
                  (id INTEGER PRIMARY KEY,
                  employee_id INTEGER, 
@@ -22,7 +28,7 @@ def create_tables():
                  (id INTEGER PRIMARY KEY,
                  date TEXT,
                  employee_id INTEGER, 
-                 advance INTEGER)''')  # Add 'salary' table
+                 payment INTEGER)''')
     conn.commit()
     conn.close()
 
@@ -56,7 +62,7 @@ def index():
         "December": 31
     }
     # Fetch employees from the database
-    conn = sqlite3.connect('attendance.db')
+    conn = sqlite3.connect('employee.db')
     # Enable row factory
     conn.row_factory = sqlite3.Row
 
@@ -97,9 +103,12 @@ def index():
 
     conn.close()
 
+    # Inside your route function
+    today_date = date.today().isoformat()  # Get today's date in ISO format (YYYY-MM-DD)
+
     return render_template('index.html', employees=employees,
                            months=months, days_in_month=days_in_month,
-                           attendance_records=attendance_records)
+                           attendance_records=attendance_records, today_date=today_date)
 
 
 # Route to handle adding an employee
@@ -109,11 +118,12 @@ def add_employee():
         # Get data from the form
         name = request.form['name']
         contact = request.form['contact']
+        salary = request.form['monthlysalary']
 
         # Add the employee to the database
-        conn = sqlite3.connect('attendance.db')
+        conn = sqlite3.connect('employee.db')
         c = conn.cursor()
-        c.execute("INSERT INTO employees (name, contact) VALUES (?, ?)", (name, contact))
+        c.execute("INSERT INTO employees (name,salary, contact) VALUES (?, ?, ?)", (name, salary, contact))
         conn.commit()
         conn.close()
 
@@ -133,7 +143,7 @@ def save_attendance():
 
         try:
             # Connect to SQLite database
-            conn = sqlite3.connect('attendance.db')
+            conn = sqlite3.connect('employee.db')
             c = conn.cursor()
 
             print(employee_id, month, day)
@@ -161,11 +171,11 @@ def get_salary():
 
     try:
         # Connect to the SQLite database
-        conn = sqlite3.connect('attendance.db')
+        conn = sqlite3.connect('employee.db')
         c = conn.cursor()
 
         # Query the database to retrieve salary information for the selected employee
-        c.execute("SELECT date, advance FROM salary WHERE employee_id = ?", (employee_name,))
+        c.execute("SELECT date, payment FROM salary WHERE employee_id = ?", (employee_name,))
         salary_data = c.fetchall()
 
         # Convert the fetched data into a list of dictionaries
@@ -189,17 +199,17 @@ def save_salary():
         # Get data from the form
         salary_date = request.form['salaryDate']
         employee_id = request.form['employee']
-        advance = request.form['advance']
+        payment = request.form['payment']
 
         try:
             # Connect to SQLite database
-            conn = sqlite3.connect('attendance.db')
+            conn = sqlite3.connect('employee.db')
             c = conn.cursor()
-            print("save_salary", salary_date, employee_id, advance)
+            print("save_salary", salary_date, employee_id, payment)
 
             # Insert salary record into the database
-            c.execute("INSERT INTO salary (date, employee_id, advance) VALUES (?, ?, ?)",
-                      (salary_date, employee_id, advance))
+            c.execute("INSERT INTO salary (date, employee_id, payment) VALUES (?, ?, ?)",
+                      (salary_date, employee_id, payment))
 
             # Commit changes and close connection
             conn.commit()
