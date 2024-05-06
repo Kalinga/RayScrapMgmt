@@ -37,31 +37,30 @@ def create_tables():
 # Call function to create tables
 create_tables()
 
+# Dummy data for months and days (you can replace this with actual data)
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+          "November", "December"]
+
+# Define the number of days in each month
+days_in_month = {
+    "January": 31,
+    "February": 28,  # Assuming non-leap year
+    "March": 31,
+    "April": 30,
+    "May": 31,
+    "June": 30,
+    "July": 31,
+    "August": 31,
+    "September": 30,
+    "October": + 31,
+    "November": 30,
+    "December": 31
+}
 
 # Route to display the Admin tab
 @app.route('/')
 def index():
 
-    # Dummy data for months and days (you can replace this with actual data)
-    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-              "November", "December"]
-    days = list(range(1, 32))  # Assuming all months have 31 days
-
-    # Define the number of days in each month
-    days_in_month = {
-        "January": 31,
-        "February": 28,  # Assuming non-leap year
-        "March": 31,
-        "April": 30,
-        "May": 31,
-        "June": 30,
-        "July": 31,
-        "August": 31,
-        "September": 30,
-        "October":+ 31,
-        "November": 30,
-        "December": 31
-    }
     # Fetch employees from the database
     conn = sqlite3.connect('employee.db')
     # Enable row factory
@@ -151,7 +150,7 @@ def save_attendance():
 
             # Insert attendance record into the database
             c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
-                      (employee_id, month, day))
+                      (employee_id, employee_name, month, day))
 
             # Commit changes and close connection
             conn.commit()
@@ -250,11 +249,11 @@ def get_monthly_details():
 
         # Query the attendance table to count the number of days the employee worked in the current month
         c.execute("SELECT COUNT(*) FROM attendance WHERE employee_name = ? AND month = ?",
-                  (employee_name, current_month))
+                  (employee_name, months[current_month-1]))
         days_worked = c.fetchone()[0]
 
         # Query the employees table to retrieve the salary of the specified employee
-        c.execute("SELECT salary FROM employees WHERE name = ?", (employee_name,))
+        c.execute("SELECT salary FROM employees WHERE employee_name = ?", (employee_name,))
         salary_record = c.fetchone()
 
         if salary_record:

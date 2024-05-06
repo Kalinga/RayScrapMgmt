@@ -205,22 +205,6 @@
                 <option value="{{ employee.employee_name }}">{{ employee.employee_name }}</option>
             {% endfor %}
         </select>
-        <script>
-            // Get the select element
-            var employeeSelect = document.getElementById('employee');
-
-            // Add event listener for 'change' event
-            employeeSelect.addEventListener('change', function() {
-                // Get the selected employee value
-                var selectedEmployee = employeeSelect.value;
-
-                // Call fetchSalary function with the selected employee
-                fetchSalary(selectedEmployee);
-
-                // Call fetchSalary function with the selected employee
-                fetchWages(selectedEmployee);
-            });
-        </script>
     </div>
     <div class="input-group">
         <label for="payment">Payment:</label>
@@ -274,7 +258,22 @@
     </table>
 
 </div>
+<script>
+    // Get the select element
+    var employeeSelect = document.getElementById('employee');
 
+    // Add event listener for 'change' event
+    employeeSelect.addEventListener('change', function() {
+        // Get the selected employee value
+        var selectedEmployee = employeeSelect.value;
+
+        // Call fetchSalary function with the selected employee
+        fetchSalary(selectedEmployee);
+
+        // Call fetchSalary function with the selected employee
+        fetchWages(selectedEmployee);
+    });
+</script>
 <script>
     // Function to handle salary submission
     function submitSalary() {
@@ -309,7 +308,7 @@
                 alert("Salary saved successfully!!");
 
                 // Reset the payment field
-                payment.value = "";
+                document.getElementById("payment").value = "";
 
                 // Fetch salary information for the selected employee
                 fetchSalary(employee);
