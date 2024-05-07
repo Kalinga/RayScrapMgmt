@@ -234,6 +234,7 @@
         <thead style="color: green;">
             <tr>
                 <th style="font-weight: bold;">DaysWorked</th>
+                <th style="font-weight: bold;">Monthly</th>
                 <th style="font-weight: bold;">PerDay</th>
                 <th style="font-weight: bold;">Total Wages</th>
             </tr>
@@ -241,22 +242,19 @@
         <tbody id="salaryTableBody2">
             <!-- Salary information will be dynamically added here -->
         </tbody>
-        <tfoot>
-            <tr>
-                <td>PreviousDues:</td>
-                <td id="previousdues"></td>
-            </tr>
-            <tr>
-                <td>TotalWage:</td>
-                <td id="totalwage"></td>
-            </tr>
-            <tr>
-                <td>To be Paid:</td>
-                <td id="tobepaid"></td>
-            </tr>
-        </tfoot>
     </table>
-
+     <div class="input-group">
+        <label for="PreviousDues">PreviousDues:</label>
+        <input type="text" id="PreviousDues" name="PreviousDues">
+    </div>
+    <div class="input-group">
+        <label for="TotalWage">TotalWage:</label>
+        <input type="text" id="TotalWage" name="TotalWage">
+    </div>
+    <div class="input-group">
+        <label for="To_be_Paid">To be Paid:</label>
+        <input type="text" id="To_be_Paid" name="To be Paid">
+    </div>
 </div>
 <script>
     // Get the select element
@@ -312,6 +310,7 @@
 
                 // Fetch salary information for the selected employee
                 fetchSalary(employee);
+                fetchWages(employee);
             } else {
                 // Error handling
                 console.error("Failed to save data:", response.statusText);
@@ -354,16 +353,25 @@
         // Apply styles to the header row
         headerRow.style.fontWeight = "bold";
         headerRow.style.color = "green";
+
         var daysWorkedHeader = headerRow.insertCell();
         daysWorkedHeader.textContent = "DaysWorked";
+
+        var monthsalaryHeader = headerRow.insertCell();
+        monthsalaryHeader.textContent = "Monthly";
+
         var salaryHeader = headerRow.insertCell();
         salaryHeader.textContent = "PerDay";
+
         var salaryHeader1 = headerRow.insertCell();
         salaryHeader1.textContent = "Total Wages";
 
         var row = table.insertRow();
         var days_worked = row.insertCell();
         days_worked.textContent = data.days_worked;
+
+        var monthly_salary = row.insertCell();
+        monthly_salary.textContent = (data.monthly_salary);
 
         var daily_salary = row.insertCell();
         daily_salary.textContent = Math.round(data.monthly_salary / 30);
