@@ -60,7 +60,6 @@ days_in_month = {
 # Route to display the Admin tab
 @app.route('/')
 def index():
-
     # Fetch employees from the database
     conn = sqlite3.connect('employee.db')
     # Enable row factory
@@ -77,6 +76,7 @@ def index():
 
     # Convert rows into a list of dictionaries
     employees = [dict(row) for row in rows]
+
 
     # Now each item in the 'employees' list is a dictionary with column names as keys
     print(employees)

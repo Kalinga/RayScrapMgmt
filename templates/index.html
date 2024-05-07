@@ -52,6 +52,7 @@
     <button class="tablinks" onclick="openTab(event, 'Misc')">Misc</button>
 </div>
 
+
 <!-- Tab content -->
 <div id="Admin" class="tabcontent">
     <h3>Admin Tab</h3>
@@ -84,6 +85,7 @@
             <button id="tab_{{ month }}" class="tablinks" onclick="openMonth('{{ month }}')">{{ month }}</button>
         {% endfor %}
     </div>
+    <button onclick="refreshAttendance()">Refresh</button>
 
     <!-- Table for employee attendance -->
     {% for month in months %}
@@ -127,6 +129,10 @@
 </div>
 
 <script>
+    function refreshAttendance() {
+        window.location.href = "/";
+    }
+
     function saveAttendance(employeeId, employeeName, month, day, checked) {
         // Make an AJAX request to Flask backend to save attendance record
         var xhr = new XMLHttpRequest();
