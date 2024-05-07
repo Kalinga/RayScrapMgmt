@@ -252,7 +252,18 @@
     <!-- Thick horizontal line -->
     <hr style="height: 5px; background-color: black; border: none; margin: 20px 0;">
 
-     <div class="input-group">
+    <style>
+        .input-group {
+            margin-bottom: 20px; /* Add vertical spacing between input groups */
+        }
+
+        .input-group label {
+            color: red; /* Set label text color to red */
+            font-weight: bold; /* Set label text to bold */
+        }
+    </style>
+
+    <div class="input-group">
         <label for="PreviousDues">Previous Dues:</label>
         <input type="text" id="PreviousDues" name="PreviousDues" oninput="updateTotalWage()">
     </div>
@@ -274,6 +285,7 @@
         <label for="To_be_Paid">To be Paid:</label>
         <input type="text" id="To_be_Paid" name="To be Paid" readonly>
     </div>
+
 </div>
 <script>
     function updateTotalWage() {
