@@ -89,6 +89,7 @@ def index():
         for month in months:
             attendance_records[employee_id][month] = {}
             for day in range(1, days_in_month[month] + 1):
+                attendance_records[employee_id][month]['total'] = 0  # Initialize total days present to 0
                 attendance_records[employee_id][month][day] = False  # Initialize as unchecked
 
     # Execute the query to fetch attendance records
@@ -99,6 +100,8 @@ def index():
         month = row['month']
         day = row['day']
         attendance_records[employee_id][month][day] = True  # Mark as checked
+        attendance_records[employee_id][month]['total'] += 1  # Increment total days present
+
     print (attendance_records)
 
     conn.close()

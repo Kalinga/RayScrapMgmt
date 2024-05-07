@@ -111,6 +111,7 @@
                                 {% if attendance_records[employee.id][month][day] %} checked {% endif %}>
                             </td>
                         {% endfor %}
+                        <td>{{ attendance_records[employee.id][month]['total'] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
