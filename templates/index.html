@@ -211,6 +211,9 @@
         <input type="text" id="payment" name="payment">
     </div>
     <button onclick="submitSalary()">Submit</button>
+    <!-- Thick horizontal line -->
+    <hr style="height: 5px; background-color: black; border: none; margin: 20px 0;">
+
      <!-- Table to display salary information -->
     <table id="salaryTable">
         <thead style="color: green;">
@@ -230,32 +233,95 @@
         </tfoot>
     </table>
 
+    <!-- Thick horizontal line -->
+    <hr style="height: 5px; background-color: black; border: none; margin: 20px 0;">
+
     <table id="salaryTable2">
         <thead style="color: green;">
             <tr>
                 <th style="font-weight: bold;">DaysWorked</th>
                 <th style="font-weight: bold;">Monthly</th>
                 <th style="font-weight: bold;">PerDay</th>
-                <th style="font-weight: bold;">Total Wages</th>
+                <th style="font-weight: bold;">Total</th>
             </tr>
         </thead>
         <tbody id="salaryTableBody2">
             <!-- Salary information will be dynamically added here -->
         </tbody>
     </table>
+    <!-- Thick horizontal line -->
+    <hr style="height: 5px; background-color: black; border: none; margin: 20px 0;">
+
      <div class="input-group">
-        <label for="PreviousDues">PreviousDues:</label>
-        <input type="text" id="PreviousDues" name="PreviousDues">
+        <label for="PreviousDues">Previous Dues:</label>
+        <input type="text" id="PreviousDues" name="PreviousDues" oninput="updateTotalWage()">
     </div>
     <div class="input-group">
-        <label for="TotalWage">TotalWage:</label>
-        <input type="text" id="TotalWage" name="TotalWage">
+        <label for="current_month">Current Month:</label>
+        <input type="text" id="current_month" name="Current_Month" readonly>
     </div>
+    <div class="input-group">
+        <label for="TotalWage">Total Wages:</label>
+        <input type="text" id="TotalWage" name="TotalWage" readonly>
+    </div>
+
+    <div class="input-group">
+        <label for="TotalPayment">Total Payment:</label>
+        <input type="text" id="TotalPaymentSummary" name="TotalPayment" readonly>
+    </div>
+
     <div class="input-group">
         <label for="To_be_Paid">To be Paid:</label>
-        <input type="text" id="To_be_Paid" name="To be Paid">
+        <input type="text" id="To_be_Paid" name="To be Paid" readonly>
     </div>
 </div>
+<script>
+    function updateTotalWage() {
+        // Get the value of PreviousDues input field
+        var previousDuesValue = document.getElementById("PreviousDues").value;
+
+        // Convert the value to a number (assuming it's numeric)
+        var previousDues = parseFloat(previousDuesValue);
+
+
+        // Update TotalWage input field
+        if (!isNaN(previousDues)) {
+            // Update TotalWage based on some logic (example: adding 100 to PreviousDues)
+            var table = document.getElementById("salaryTable2");
+            var currentmonthWagesCell = table.rows[1].cells[3];
+            var currentmonthWages = parseFloat(currentmonthWagesCell.textContent);
+            var totalWage = previousDues + currentmonthWages;
+
+            // Set the value of TotalWage input field
+            document.getElementById("TotalWage").value = totalWage;
+
+            // Set the value of TotalWage input field
+            var totalPaymenttable = document.getElementById("salaryTable");
+
+            // Get the index of the last row of totalPaymenttable
+            var lastRowIndex = totalPaymenttable.rows.length - 1;
+            var totalPaymentCell = totalPaymenttable.rows[lastRowIndex].cells[1];
+            var totalPayment = totalPaymentCell.textContent;
+
+            // Set the value of Current Month input field
+            document.getElementById("current_month").value = currentmonthWages;
+
+            // Set the value of Total Payment field
+            document.getElementById("TotalPaymentSummary").value = totalPayment;
+
+
+            document.getElementById("To_be_Paid").value = totalWage - totalPayment;
+        }
+    }
+    function clearPreviousDues() {
+        document.getElementById("PreviousDues").value = "";
+        document.getElementById("current_month").value = "";
+        document.getElementById("TotalPaymentSummary").value = "";
+        document.getElementById("TotalWage").value = "";
+        document.getElementById("To_be_Paid").value = "";
+
+    }
+</script>
 <script>
     // Get the select element
     var employeeSelect = document.getElementById('employee');
@@ -270,6 +336,9 @@
 
         // Call fetchSalary function with the selected employee
         fetchWages(selectedEmployee);
+
+        // Clear previousDues Section
+        clearPreviousDues();
     });
 </script>
 <script>
@@ -364,7 +433,7 @@
         salaryHeader.textContent = "PerDay";
 
         var salaryHeader1 = headerRow.insertCell();
-        salaryHeader1.textContent = "Total Wages";
+        salaryHeader1.textContent = "Total";
 
         var row = table.insertRow();
         var days_worked = row.insertCell();
@@ -428,8 +497,10 @@
         var totalPayment = data.reduce((total, item) => total + parseInt(item.salary), 0);
         var totalRow = table.insertRow();
         var totalCell = totalRow.insertCell();
-        totalCell.colSpan = 2;
-        totalCell.innerHTML = "<strong style='color: green;'>Total Payment:</strong> <strong style='color: green;'>" + totalPayment + "</strong>";
+        //totalCell.colSpan = 2;
+        totalCell.innerHTML = "<strong style='color: green;'>Total Payment:</strong>";
+        var totalCell1 = totalRow.insertCell();
+        totalCell1.innerHTML = "<strong style='color: green;'>" + totalPayment + "</strong>";
     }
 
 </script>
