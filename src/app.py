@@ -119,9 +119,9 @@ def index():
 def add_employee():
     if request.method == 'POST':
         # Get data from the form
-        name = request.form['name']
-        contact = request.form['contact']
-        salary = request.form['monthlysalary']
+        name = request.form['name'].strip()
+        contact = request.form['contact'].strip()
+        salary = request.form['monthlysalary'].strip()
 
         # Add the employee to the database
         conn = sqlite3.connect('employee.db')
@@ -150,9 +150,18 @@ def save_attendance():
             c = conn.cursor()
 
             print(employee_id, month, day)
+            # Check if the record already exists
+            c.execute("SELECT * FROM attendance WHERE employee_id = ? AND month = ? AND day = ?",
+                      (employee_id, month, day))
+            existing_record = c.fetchone()
 
-            # Insert attendance record into the database
-            c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
+            if existing_record:
+                # If record exists, delete it
+                c.execute("DELETE FROM attendance WHERE employee_id = ? AND month = ? AND day = ?",
+                          (employee_id, month, day))
+            else:
+                # If record doesn't exist, insert it
+                c.execute("INSERT INTO attendance (employee_id, employee_name, month, day) VALUES (?, ?, ?, ?)",
                       (employee_id, employee_name, month, day))
 
             # Commit changes and close connection
