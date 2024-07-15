@@ -281,6 +281,42 @@ def get_monthly_details():
         # Close the database connection
         if 'conn' in locals():
             conn.close()
+# Route to fetch payment records based on selected employee and month
+@app.route('/fetch_payment_records', methods=['GET'])
+def fetch_payment_records():
+    employee_name = request.args.get('employee')
+    month = int(request.args.get('month'))
+
+    try:
+        conn = sqlite3.connect('employee.db')
+        c = conn.cursor()
+
+        start_date = f'{datetime.datetime.now().year}-{month:02d}-01'
+        end_date = f'{datetime.datetime.now().year}-{month:02d}-31'
+
+        c.execute("SELECT date, payment FROM salary WHERE employee_name = ? AND date BETWEEN ? AND ?",
+                  (employee_name, start_date, end_date))
+        salary_data = c.fetchall()
+
+        payment_records = [{'date': row[0], 'payment': row[1]} for row in salary_data]
+
+        conn.close()
+
+        return jsonify({'payment_records': payment_records})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+# Helper function to get all employees
+def get_all_employees():
+    conn = sqlite3.connect('employee.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT * FROM employees")
+    rows = c.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
 
 # Run the Flask app
 if __name__ == '__main__':

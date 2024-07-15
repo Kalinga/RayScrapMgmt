@@ -527,9 +527,88 @@
 <div id="Misc" class="tabcontent">
     <h3>Misc Tab</h3>
     <!-- Misc content goes here -->
+    <h1>Employee Payment Records</h1>
+
+    <!-- Form to select employee and month -->
+    <form id="fetchRecordsForm" method="GET">
+        <label for="employee">Select Employee:</label>
+        <select id="employeeid" name="employee">
+            {% for employee in employees %}
+                <option value="{{ employee['employee_name'] }}">{{ employee['employee_name'] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="month">Select Month:</label>
+        <select id="month" name="month">
+            {% for month in months %}
+                <option value="{{ loop.index }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="button" onclick="fetchPaymentRecords()">Fetch Records</button>
+    </form>
+
+    <!-- Container to display payment records -->
+    <div id="paymentRecords"></div>
+
+    <script>
+        function fetchPaymentRecords() {
+            var employeeName = document.getElementById('employeeid').value;
+            var month = document.getElementById('month').value;
+
+            // Create an XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+            // Configure it: GET-request for the URL /fetch_payment_records with parameters
+            xhr.open('GET', '/fetch_payment_records?employee=' + encodeURIComponent(employeeName) + '&month=' + encodeURIComponent(month), true);
+
+            // Set up the callback function for when the request completes
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    displayPaymentRecords(response.payment_records);
+                } else {
+                    alert("AJAX call failed: " + xhr.statusText);
+                    console.error(xhr.statusText);
+                    document.getElementById('paymentRecords').innerHTML = '<p>Error fetching payment records.</p>';
+                }
+            };
+
+            // Set up the callback function for when there's an error
+            xhr.onerror = function() {
+                alert("AJAX call failed: " + xhr.statusText);
+                console.error(xhr.statusText);
+                document.getElementById('paymentRecords').innerHTML = '<p>Error fetching payment records.</p>';
+            };
+
+            // Send the request
+            xhr.send();
+        }
+
+        function displayPaymentRecords(records) {
+            var recordsContainer = document.getElementById('paymentRecords');
+            recordsContainer.innerHTML = '';
+            if (!Array.isArray(records)) {
+                recordsContainer.innerHTML = '<p>Invalid data format received.</p>';
+                console.error("Expected an array but received:", records);
+                return;
+            }
+            if (records.length === 0) {
+                recordsContainer.innerHTML = '<p>No payment records found for the selected employee and month.</p>';
+            } else {
+                var recordsList = '<ul>';
+                records.forEach(function(record) {
+                    recordsList += '<li>Date: ' + record.date + ', Payment: ' + record.payment + '</li>';
+                });
+                recordsList += '</ul>';
+
+                recordsContainer.innerHTML = recordsList;
+            }
+        }
+    </script>
 </div>
 
 <script>
+
     function openTab(evt, tabName) {
         // Declare all variables
         var i, tabcontent, tablinks;
